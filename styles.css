@@ -1,0 +1,17 @@
+body {
+    background-color: lightgrey;
+    display: block;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-content {
+    width: 50%;
+    background-color: white;
+    border: 1px solid black;
+    justify-content: center;
+    display: block;
+    text-align: center;
+    margin: 0 auto;
+    padding: 20px;
+}

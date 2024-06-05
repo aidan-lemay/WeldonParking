@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Weldon Street Parking</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta http-equiv="refresh" content="30">
+
+    <script>
+        /*
+            You CANNOT park on the ODD side of the street:
+            7pm Monday - 6pm Tuesday
+            7pm Wednesday - 6pm Thursday
+            7pm Friday - 6pm Saturday
+
+            You CANNOT park on the EVEN side of the street:
+            7pm Tuesday - 6pm Wednesday
+            7pm Thursday - 6pm Friday
+            7pm Saturday - 6pm Monday
+
+            Odd side:
+            Allowed: All day Sunday, and from 6pm to 7pm on Tuesday, Wednesday, and Friday, and after 6pm on Saturday.
+
+            Even side:
+            Allowed: From 6pm to 7pm on Monday, Tuesday, Thursday, and Saturday, and after 6pm on Wednesday and Friday.
+        */
+
+        function getParkingSide() {
+            const date = new Date(new Date().toISOString());
+            const day = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+
+            function isWithinTimeRange(startHour, startMinute, endHour, endMinute) {
+                const currentMinutes = hours * 60 + minutes;
+                const startMinutes = startHour * 60 + startMinute;
+                const endMinutes = endHour * 60 + endMinute;
+
+                if (startMinutes < endMinutes) {
+                    return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+                } else {
+                    return currentMinutes >= startMinutes || currentMinutes < endMinutes;
+                }
+            }
+
+            // Determine which side to park on based on the restrictions
+            if ((day === 1 && isWithinTimeRange(19, 0, 18, 0)) || // Monday 7pm - Tuesday 6pm
+                (day === 3 && isWithinTimeRange(19, 0, 18, 0)) || // Wednesday 7pm - Thursday 6pm
+                (day === 5 && isWithinTimeRange(19, 0, 18, 0))) { // Friday 7pm - Saturday 6pm
+                return "Even side";
+            }
+
+            if ((day === 2 && isWithinTimeRange(19, 0, 18, 0)) || // Tuesday 7pm - Wednesday 6pm
+                (day === 4 && isWithinTimeRange(19, 0, 18, 0)) || // Thursday 7pm - Friday 6pm
+                (day === 6 && isWithinTimeRange(19, 0, 18, 0)) || // Saturday 7pm - Monday 6pm
+                (day === 0 && isWithinTimeRange(0, 0, 18, 0))) { // Sunday 12am - Monday 6pm
+                return "Odd side";
+            }
+
+            // Default to "No restriction" if no conditions match
+            return "No restriction";
+        }
+
+        function getFormattedDateTime() {
+            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            const now = new Date();
+            const dayOfWeek = daysOfWeek[now.getDay()];
+            const month = months[now.getMonth()];
+            const day = now.getDate();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            const formattedHours = String(hours).padStart(2, '0');
+
+            return `${dayOfWeek}, ${month} ${day} - ${formattedHours}:${minutes} ${ampm}`;
+        }
+
+        function getNextParkingSwap() {
+            const now = new Date();
+            const day = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+
+            function getSwapDate(dayOffset, hour, minute) {
+                const swapDate = new Date(now);
+                swapDate.setDate(now.getDate() + dayOffset);
+                swapDate.setHours(hour, minute, 0, 0);
+                return swapDate;
+            }
+
+            const swaps = [
+                { day: 1, hour: 19, minute: 0 },  // Monday 7pm
+                { day: 2, hour: 18, minute: 0 },  // Tuesday 6pm
+                { day: 2, hour: 19, minute: 0 },  // Tuesday 7pm
+                { day: 3, hour: 18, minute: 0 },  // Wednesday 6pm
+                { day: 3, hour: 19, minute: 0 },  // Wednesday 7pm
+                { day: 4, hour: 18, minute: 0 },  // Thursday 6pm
+                { day: 4, hour: 19, minute: 0 },  // Thursday 7pm
+                { day: 5, hour: 18, minute: 0 },  // Friday 6pm
+                { day: 5, hour: 19, minute: 0 },  // Friday 7pm
+                { day: 6, hour: 18, minute: 0 },  // Saturday 6pm
+                { day: 6, hour: 19, minute: 0 },  // Saturday 7pm
+                { day: 0, hour: 18, minute: 0 },  // Sunday 6pm
+                { day: 0, hour: 19, minute: 0 }   // Sunday 7pm
+            ];
+
+            let nextSwap = null;
+
+            for (let i = 0; i < swaps.length; i++) {
+                const swap = swaps[i];
+                const swapDayOffset = (swap.day + 7 - day) % 7;
+                const swapDate = getSwapDate(swapDayOffset, swap.hour, swap.minute);
+
+                if (swapDate > now) {
+                    if (nextSwap === null || swapDate < nextSwap) {
+                        nextSwap = swapDate;
+                    }
+                }
+            }
+
+            if (nextSwap) {
+                const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+                const dayOfWeek = daysOfWeek[nextSwap.getDay()];
+                const month = months[nextSwap.getMonth()];
+                const day = nextSwap.getDate();
+                let hours = nextSwap.getHours();
+                const minutes = String(nextSwap.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+
+                hours = hours % 12;
+                hours = hours ? hours : 12; // the hour '0' should be '12'
+                const formattedHours = String(hours).padStart(2, '0');
+
+                return `${dayOfWeek}, ${month} ${day} - ${formattedHours}:${minutes} ${ampm}`;
+            }
+
+            return "No upcoming swaps";
+        }
+
+
+        function setHTML() {
+            const now = document.getElementById("now");
+            const side = document.getElementById("side");
+            const nextswap = document.getElementById("nextswap");
+
+            now.innerHTML = "<span style='text-decoration: underline;'>The Time Is:</span> " + getFormattedDateTime();
+            side.innerHTML = "<span style='text-decoration: underline;'>Current Parking:</span> " + getParkingSide();
+            nextswap.innerHTML = "<span style='text-decoration: underline;'>The Next Parking Swap Will Be:</span> " + getNextParkingSwap();
+        }
+
+    </script>
+</head>
+
+<body onload="setHTML()">
+    <div class="center-content">
+        <h1 style="font-weight: bold;">Parking</h1>
+
+        <h2 id="now"></h2>
+        <h2 id="side"></h2>
+        <h2 id="nextswap"></h2>
+    </div>
+</body>
+
+<footer>
+
+</footer>
+
+</html>
