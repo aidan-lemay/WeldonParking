@@ -6,7 +6,7 @@ body {
 }
 
 .center-content {
-    width: 50%;
+    width: 80%;
     background-color: white;
     border: 1px solid black;
     justify-content: center;
@@ -14,10 +14,4 @@ body {
     text-align: center;
     margin: 0 auto;
     padding: 20px;
-}
-
-@media only screen and (min-width: 600px) {
-    .center-content {
-        width: 95%;
-    }
 }
