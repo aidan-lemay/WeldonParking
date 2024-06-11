@@ -44,15 +44,15 @@
             }
 
             // Determine which side to park on based on the restrictions
-            if ((day === 1 && isWithinTimeRange(19, 0, 18, 0)) || // Monday 7pm - Tuesday 6pm
-                (day === 3 && isWithinTimeRange(19, 0, 18, 0)) || // Wednesday 7pm - Thursday 6pm
-                (day === 5 && isWithinTimeRange(19, 0, 18, 0))) { // Friday 7pm - Saturday 6pm
+            if ((day === 1 && isWithinTimeRange(18, 0, 18, 0)) || // Monday 7pm - Tuesday 6pm
+                (day === 3 && isWithinTimeRange(18, 0, 18, 0)) || // Wednesday 7pm - Thursday 6pm
+                (day === 5 && isWithinTimeRange(18, 0, 18, 0))) { // Friday 7pm - Saturday 6pm
                 return "Even side";
             }
 
-            if ((day === 2 && isWithinTimeRange(19, 0, 18, 0)) || // Tuesday 7pm - Wednesday 6pm
-                (day === 4 && isWithinTimeRange(19, 0, 18, 0)) || // Thursday 7pm - Friday 6pm
-                (day === 6 && isWithinTimeRange(19, 0, 18, 0)) || // Saturday 7pm - Monday 6pm
+            if ((day === 2 && isWithinTimeRange(18, 0, 18, 0)) || // Tuesday 7pm - Wednesday 6pm
+                (day === 4 && isWithinTimeRange(18, 0, 18, 0)) || // Thursday 7pm - Friday 6pm
+                (day === 6 && isWithinTimeRange(18, 0, 18, 0)) || // Saturday 7pm - Monday 6pm
                 (day === 0 && isWithinTimeRange(0, 0, 18, 0))) { // Sunday 12am - Monday 6pm
                 return "Odd side";
             }
@@ -94,19 +94,13 @@
             }
 
             const swaps = [
-                { day: 1, hour: 19, minute: 0 },  // Monday 7pm
-                { day: 2, hour: 18, minute: 0 },  // Tuesday 6pm
-                { day: 2, hour: 19, minute: 0 },  // Tuesday 7pm
-                { day: 3, hour: 18, minute: 0 },  // Wednesday 6pm
-                { day: 3, hour: 19, minute: 0 },  // Wednesday 7pm
-                { day: 4, hour: 18, minute: 0 },  // Thursday 6pm
-                { day: 4, hour: 19, minute: 0 },  // Thursday 7pm
-                { day: 5, hour: 18, minute: 0 },  // Friday 6pm
-                { day: 5, hour: 19, minute: 0 },  // Friday 7pm
-                { day: 6, hour: 18, minute: 0 },  // Saturday 6pm
-                { day: 6, hour: 19, minute: 0 },  // Saturday 7pm
-                { day: 0, hour: 18, minute: 0 },  // Sunday 6pm
-                { day: 0, hour: 19, minute: 0 }   // Sunday 7pm
+                { day: 1, hour: 18, minute: 0, side: "Even side" },  // Monday 7pm
+                { day: 2, hour: 18, minute: 0, side: "Odd side" },   // Tuesday 7pm
+                { day: 3, hour: 18, minute: 0, side: "Even side" },  // Wednesday 7pm
+                { day: 4, hour: 18, minute: 0, side: "Odd side" },   // Thursday 7pm
+                { day: 5, hour: 18, minute: 0, side: "Even side" },  // Friday 7pm
+                { day: 6, hour: 18, minute: 0, side: "Odd side" },   // Saturday 7pm
+                { day: 0, hour: 18, minute: 0, side: "No restriction" } // Sunday 7pm
             ];
 
             let nextSwap = null;
@@ -117,8 +111,8 @@
                 const swapDate = getSwapDate(swapDayOffset, swap.hour, swap.minute);
 
                 if (swapDate > now) {
-                    if (nextSwap === null || swapDate < nextSwap) {
-                        nextSwap = swapDate;
+                    if (nextSwap === null || swapDate < nextSwap.date) {
+                        nextSwap = { date: swapDate, side: swap.side };
                     }
                 }
             }
@@ -127,18 +121,18 @@
                 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
                 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-                const dayOfWeek = daysOfWeek[nextSwap.getDay()];
-                const month = months[nextSwap.getMonth()];
-                const day = nextSwap.getDate();
-                let hours = nextSwap.getHours();
-                const minutes = String(nextSwap.getMinutes()).padStart(2, '0');
+                const dayOfWeek = daysOfWeek[nextSwap.date.getDay()];
+                const month = months[nextSwap.date.getMonth()];
+                const day = nextSwap.date.getDate();
+                let hours = nextSwap.date.getHours();
+                const minutes = String(nextSwap.date.getMinutes()).padStart(2, '0');
                 const ampm = hours >= 12 ? 'PM' : 'AM';
 
                 hours = hours % 12;
                 hours = hours ? hours : 12; // the hour '0' should be '12'
                 const formattedHours = String(hours).padStart(2, '0');
 
-                return `${dayOfWeek}, ${month} ${day} - ${formattedHours}:${minutes} ${ampm}`;
+                return `${nextSwap.side} on ${dayOfWeek}, ${month} ${day} - ${formattedHours}:${minutes} ${ampm}`;
             }
 
             return "No upcoming swaps";
