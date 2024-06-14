@@ -39,7 +39,7 @@ function getSide() {
             return "Odd";
         }
         // After 1800, return Even
-        else if (hour > 18) {
+        else if (hour >= 18) {
             return "Even"
         }
     }
@@ -51,7 +51,7 @@ function getSide() {
             return "Even";
         }
         // After 1800, return Even
-        else if (hour > 18) {
+        else if (hour >= 18) {
             return "Odd"
         }
     }
@@ -63,7 +63,7 @@ function getSide() {
             return "Odd";
         }
         // After 1800, return Even
-        else if (hour > 18) {
+        else if (hour >= 18) {
             return "Even"
         }
     }
@@ -75,7 +75,7 @@ function getSide() {
             return "Even";
         }
         // After 1800, return Even
-        else if (hour > 18) {
+        else if (hour >= 18) {
             return "Odd"
         }
     }
@@ -87,7 +87,7 @@ function getSide() {
             return "Odd";
         }
         // After 1800, return Even
-        else if (hour > 18) {
+        else if (hour >= 18) {
             return "Even"
         }
     }
@@ -99,7 +99,7 @@ function getSide() {
             return "Even";
         }
         // After 1800, return Even
-        else if (hour > 18) {
+        else if (hour >= 18) {
             return "Odd"
         }
     }
@@ -108,18 +108,18 @@ function getSide() {
 function nextSwap() {
     // If Sunday
     if (day == 0) {
-        return "Monday, 06:00 PM";
+        return "Monday, 06:00 PM to Even Side";
     }
 
     // If Monday
     else if (day == 1) {
         // Before 1800
         if (hour < 18) {
-            return "Monday, 06:00 PM";
+            return "Monday, 06:00 PM to Even Side";
         }
         // After 1800
-        else if (hour > 18) {
-            return "Tuesday, 06:00 PM"
+        else if (hour >= 18) {
+            return "Tuesday, 06:00 PM to Odd Side"
         }
     }
 
@@ -127,11 +127,11 @@ function nextSwap() {
     else if (day == 2) {
         // Before 1800
         if (hour < 18) {
-            return "Tuesday, 06:00 PM";
+            return "Tuesday, 06:00 PM to Odd Side";
         }
         // After 1800
-        else if (hour > 18) {
-            return "Wednesday, 06:00 PM"
+        else if (hour >= 18) {
+            return "Wednesday, 06:00 PM to Even Side"
         }
     }
 
@@ -139,11 +139,11 @@ function nextSwap() {
     else if (day == 3) {
         // Before 1800
         if (hour < 18) {
-            return "Wednesday, 06:00 PM";
+            return "Wednesday, 06:00 PM to Even Side";
         }
         // After 1800
-        else if (hour > 18) {
-            return "Thursday, 06:00 PM"
+        else if (hour >= 18) {
+            return "Thursday, 06:00 PM to Odd Side"
         }
     }
 
@@ -151,11 +151,11 @@ function nextSwap() {
     else if (day == 4) {
         // Before 1800
         if (hour < 18) {
-            return "Thursday, 06:00 PM";
+            return "Thursday, 06:00 PM to Odd Side";
         }
         // After 1800
-        else if (hour > 18) {
-            return "Friday, 06:00 PM"
+        else if (hour >= 18) {
+            return "Friday, 06:00 PM to Even Side"
         }
     }
 
@@ -163,11 +163,11 @@ function nextSwap() {
     else if (day == 5) {
         // Before 1800
         if (hour < 18) {
-            return "Friday, 06:00 PM";
+            return "Friday, 06:00 PM to Even Side";
         }
         // After 1800
-        else if (hour > 18) {
-            return "Saturday, 06:00 PM"
+        else if (hour >= 18) {
+            return "Saturday, 06:00 PM to Odd Side"
         }
     }
 
@@ -175,14 +175,43 @@ function nextSwap() {
     else if (day == 6) {
         // Before 1800
         if (hour < 18) {
-            return "Saturday, 06:00 PM";
+            return "Saturday, 06:00 PM to Odd Side";
         }
         // After 1800
-        else if (hour > 18) {
-            return "Monday, 06:00 PM"
+        else if (hour >= 18) {
+            return "Monday, 06:00 PM to Even Side"
         }
     }
 }
 
-console.log(getSide())
-console.log(nextSwap())
+function getFormattedDateTime() {
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+    const now = new Date();
+    const dayOfWeek = daysOfWeek[now.getDay()];
+    const month = months[now.getMonth()];
+    const day = now.getDate();
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const formattedHours = String(hours).padStart(2, '0');
+
+    return `${dayOfWeek}, ${month} ${day} - ${formattedHours}:${minutes} ${ampm}`;
+}
+
+function setHTML() {
+    const now = document.getElementById("now");
+    const side = document.getElementById("side");
+    const nextswap = document.getElementById("nextswap");
+
+    now.innerHTML = "<span style='text-decoration: underline;'>The Time Is:</span> " + getFormattedDateTime();
+    side.innerHTML = "<span style='text-decoration: underline;'>Current Parking:</span> " + getSide() + " Side";
+    nextswap.innerHTML = "<span style='text-decoration: underline;'>The Next Parking Swap Will Be:</span> " + nextSwap();
+}
+
+// console.log(getSide())
+// console.log(nextSwap())
