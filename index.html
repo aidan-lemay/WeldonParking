@@ -8,57 +8,189 @@
 
     <script>
         /*
-            You CANNOT park on the ODD side of the street:
-            7pm Monday - 6pm Tuesday
-            7pm Wednesday - 6pm Thursday
-            7pm Friday - 6pm Saturday
+Sunday: Odd all day
+Monday: Odd until 6pm, then Even
+Tuesday: Even until 6pm, then Odd
+Wednesday: Odd until 6pm, then Even
+Thursday: Even until 6pm, then Odd
+Friday: Odd until 6pm, then Even
+Saturday: Even until 6pm, then Odd
+*/
 
-            You CANNOT park on the EVEN side of the street:
-            7pm Tuesday - 6pm Wednesday
-            7pm Thursday - 6pm Friday
-            7pm Saturday - 6pm Monday
-
-            Odd side:
-            Allowed: All day Sunday, and from 6pm to 7pm on Tuesday, Wednesday, and Friday, and after 6pm on Saturday.
-
-            Even side:
-            Allowed: From 6pm to 7pm on Monday, Tuesday, Thursday, and Saturday, and after 6pm on Wednesday and Friday.
+        /*
+        now.getDay();
+        0 = Sunday
+        1 = Monday
+        2 = Tuesday
+        3 = Wednesday
+        4 = Thursday
+        5 = Friday
+        6 = Saturday
+        
+        now.getHours();
+        0 - 23
         */
 
-        function getParkingSide() {
-            const date = new Date(new Date().toISOString());
-            const day = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
+        const now = new Date();
+        const day = now.getDay();
+        const hour = now.getHours();
 
-            function isWithinTimeRange(startHour, startMinute, endHour, endMinute) {
-                const currentMinutes = hours * 60 + minutes;
-                const startMinutes = startHour * 60 + startMinute;
-                const endMinutes = endHour * 60 + endMinute;
+        function getSide() {
+            // If Sunday, return Odd
+            if (day == 0) {
+                return "Odd";
+            }
 
-                if (startMinutes < endMinutes) {
-                    return currentMinutes >= startMinutes && currentMinutes < endMinutes;
-                } else {
-                    return currentMinutes >= startMinutes || currentMinutes < endMinutes;
+            // If Monday
+            else if (day == 1) {
+                // Before 1800, return Odd
+                if (hour < 18) {
+                    return "Odd";
+                }
+                // After 1800, return Even
+                else if (hour > 18) {
+                    return "Even"
                 }
             }
 
-            // Determine which side to park on based on the restrictions
-            if ((day === 1 && isWithinTimeRange(18, 0, 18, 0)) || // Monday 7pm - Tuesday 6pm
-                (day === 3 && isWithinTimeRange(18, 0, 18, 0)) || // Wednesday 7pm - Thursday 6pm
-                (day === 5 && isWithinTimeRange(18, 0, 18, 0))) { // Friday 7pm - Saturday 6pm
-                return "Even side";
+            // If Tuesday
+            else if (day == 2) {
+                // Before 1800, return Even
+                if (hour < 18) {
+                    return "Even";
+                }
+                // After 1800, return Even
+                else if (hour > 18) {
+                    return "Odd"
+                }
             }
 
-            if ((day === 2 && isWithinTimeRange(18, 0, 18, 0)) || // Tuesday 7pm - Wednesday 6pm
-                (day === 4 && isWithinTimeRange(18, 0, 18, 0)) || // Thursday 7pm - Friday 6pm
-                (day === 6 && isWithinTimeRange(18, 0, 18, 0)) || // Saturday 7pm - Monday 6pm
-                (day === 0 && isWithinTimeRange(0, 0, 18, 0))) { // Sunday 12am - Monday 6pm
-                return "Odd side";
+            // If Wednesday
+            else if (day == 3) {
+                // Before 1800, return Odd
+                if (hour < 18) {
+                    return "Odd";
+                }
+                // After 1800, return Even
+                else if (hour > 18) {
+                    return "Even"
+                }
             }
 
-            // Default to "No restriction" if no conditions match
-            return "No restriction";
+            // If Thursday
+            else if (day == 4) {
+                // Before 1800, return Even
+                if (hour < 18) {
+                    return "Even";
+                }
+                // After 1800, return Even
+                else if (hour > 18) {
+                    return "Odd"
+                }
+            }
+
+            // If Friday
+            else if (day == 5) {
+                // Before 1800, return Odd
+                if (hour < 18) {
+                    return "Odd";
+                }
+                // After 1800, return Even
+                else if (hour > 18) {
+                    return "Even"
+                }
+            }
+
+            // If Saturday
+            else if (day == 6) {
+                // Before 1800, return Even
+                if (hour < 18) {
+                    return "Even";
+                }
+                // After 1800, return Even
+                else if (hour > 18) {
+                    return "Odd"
+                }
+            }
+        }
+
+        function nextSwap() {
+            // If Sunday
+            if (day == 0) {
+                return "Monday, 06:00 PM to Even Side";
+            }
+
+            // If Monday
+            else if (day == 1) {
+                // Before 1800
+                if (hour < 18) {
+                    return "Monday, 06:00 PM to Even Side";
+                }
+                // After 1800
+                else if (hour > 18) {
+                    return "Tuesday, 06:00 PM to Odd Side"
+                }
+            }
+
+            // If Tuesday
+            else if (day == 2) {
+                // Before 1800
+                if (hour < 18) {
+                    return "Tuesday, 06:00 PM to Odd Side";
+                }
+                // After 1800
+                else if (hour > 18) {
+                    return "Wednesday, 06:00 PM to Even Side"
+                }
+            }
+
+            // If Wednesday
+            else if (day == 3) {
+                // Before 1800
+                if (hour < 18) {
+                    return "Wednesday, 06:00 PM to Even Side";
+                }
+                // After 1800
+                else if (hour > 18) {
+                    return "Thursday, 06:00 PM to Odd Side"
+                }
+            }
+
+            // If Thursday
+            else if (day == 4) {
+                // Before 1800
+                if (hour < 18) {
+                    return "Thursday, 06:00 PM to Odd Side";
+                }
+                // After 1800
+                else if (hour > 18) {
+                    return "Friday, 06:00 PM to Even Side"
+                }
+            }
+
+            // If Friday
+            else if (day == 5) {
+                // Before 1800
+                if (hour < 18) {
+                    return "Friday, 06:00 PM to Even Side";
+                }
+                // After 1800
+                else if (hour > 18) {
+                    return "Saturday, 06:00 PM to Odd Side"
+                }
+            }
+
+            // If Saturday
+            else if (day == 6) {
+                // Before 1800
+                if (hour < 18) {
+                    return "Saturday, 06:00 PM to Odd Side";
+                }
+                // After 1800
+                else if (hour > 18) {
+                    return "Monday, 06:00 PM to Even Side"
+                }
+            }
         }
 
         function getFormattedDateTime() {
@@ -80,73 +212,14 @@
             return `${dayOfWeek}, ${month} ${day} - ${formattedHours}:${minutes} ${ampm}`;
         }
 
-        function getNextParkingSwap() {
-            const now = new Date();
-            const day = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-            const hours = now.getHours();
-            const minutes = now.getMinutes();
-
-            function getSwapDate(dayOffset, hour, minute) {
-                const swapDate = new Date(now);
-                swapDate.setDate(now.getDate() + dayOffset);
-                swapDate.setHours(hour, minute, 0, 0);
-                return swapDate;
-            }
-
-            const swaps = [
-                { day: 1, hour: 18, minute: 0, side: "Even side" },  // Monday 7pm
-                { day: 2, hour: 18, minute: 0, side: "Odd side" },   // Tuesday 7pm
-                { day: 3, hour: 18, minute: 0, side: "Even side" },  // Wednesday 7pm
-                { day: 4, hour: 18, minute: 0, side: "Odd side" },   // Thursday 7pm
-                { day: 5, hour: 18, minute: 0, side: "Even side" },  // Friday 7pm
-                { day: 6, hour: 18, minute: 0, side: "Odd side" },   // Saturday 7pm
-                { day: 0, hour: 18, minute: 0, side: "No restriction" } // Sunday 7pm
-            ];
-
-            let nextSwap = null;
-
-            for (let i = 0; i < swaps.length; i++) {
-                const swap = swaps[i];
-                const swapDayOffset = (swap.day + 7 - day) % 7;
-                const swapDate = getSwapDate(swapDayOffset, swap.hour, swap.minute);
-
-                if (swapDate > now) {
-                    if (nextSwap === null || swapDate < nextSwap.date) {
-                        nextSwap = { date: swapDate, side: swap.side };
-                    }
-                }
-            }
-
-            if (nextSwap) {
-                const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-                const dayOfWeek = daysOfWeek[nextSwap.date.getDay()];
-                const month = months[nextSwap.date.getMonth()];
-                const day = nextSwap.date.getDate();
-                let hours = nextSwap.date.getHours();
-                const minutes = String(nextSwap.date.getMinutes()).padStart(2, '0');
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-
-                hours = hours % 12;
-                hours = hours ? hours : 12; // the hour '0' should be '12'
-                const formattedHours = String(hours).padStart(2, '0');
-
-                return `${nextSwap.side} on ${dayOfWeek}, ${month} ${day} - ${formattedHours}:${minutes} ${ampm}`;
-            }
-
-            return "No upcoming swaps";
-        }
-
-
         function setHTML() {
             const now = document.getElementById("now");
             const side = document.getElementById("side");
             const nextswap = document.getElementById("nextswap");
 
             now.innerHTML = "<span style='text-decoration: underline;'>The Time Is:</span> " + getFormattedDateTime();
-            side.innerHTML = "<span style='text-decoration: underline;'>Current Parking:</span> " + getParkingSide();
-            nextswap.innerHTML = "<span style='text-decoration: underline;'>The Next Parking Swap Will Be:</span> " + getNextParkingSwap();
+            side.innerHTML = "<span style='text-decoration: underline;'>Current Parking:</span> " + getSide() + " Side";
+            nextswap.innerHTML = "<span style='text-decoration: underline;'>The Next Parking Swap Will Be:</span> " + nextSwap();
         }
 
     </script>
